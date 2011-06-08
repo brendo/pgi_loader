@@ -1,0 +1,12 @@
+.active .settings.pgi-picker {
+	border-bottom: none;
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+.active .settings.pgi-pickable {
+	border-top: 0;
+	padding-top: 0;
+}
+.active .settings.pgi-pickable legend {
+	display: none;
+}
