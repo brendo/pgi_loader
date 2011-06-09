@@ -146,8 +146,9 @@
 			$path = $this->__getDriverPath($name);
 
 			if(!is_file($path)){
-				trigger_error(__('Could not find Payment Gateway <code>%s</code>. Ensure that it is installed, and enabled.', array($name)), E_USER_ERROR);
-				return false;
+				throw new PaymentGatewayException(
+					__('Could not find Payment Gateway <code>%s</code>. Ensure that it is installed, and enabled.', array($name))
+				);
 			}
 
 			if(!class_exists($classname)) {
