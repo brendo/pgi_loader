@@ -6,7 +6,7 @@
 			return array(
 				'name' => 'Payment Gateway Loader',
 				'version' => '0.1',
-				'release-date' => 'unreleased',
+				'release-date' => '2011-12-14',
 				'author' => array(
 					array(
 						'name' => 'Brendan Abbott',

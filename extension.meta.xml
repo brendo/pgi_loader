@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension id="pgi_loader" status="experimental" xmlns="http://symphony-cms.com/schemas/extension/1.0">
+	<name>PGI Loader</name>
+	<description>Provides an common interface for Payment Gateway extensions to extend so developers can interact with a number of gateways using the same API</description>
+	<repo type="github">https://github.com/brendo/pgi_loader</repo>
+	<types>
+		<type>Workflow</type>
+	</types>
+	<authors>
+		<author>
+			<name github="brendo" symphony="brendo">Brendan Abbott</name>
+			<website>http://www.bloodbone.ws</website>
+		</author>
+	</authors>
+	<releases>
+		<release version="0.1" date="2011-12-14" min="2.2.x" />
+	</releases>
+	<dependencies>
+		<dependency>asdc</dependency>
+		<dependency>databasemanipulator</dependency>
+	</dependencies>
+</extension>
