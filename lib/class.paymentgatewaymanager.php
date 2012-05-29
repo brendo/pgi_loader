@@ -1,26 +1,24 @@
 <?php
 
 	require_once(EXTENSIONS . '/pgi_loader/lib/class.paymentgateway.php');
-	require_once(TOOLKIT . '/class.manager.php');
+	require_once(FACE . '/interface.fileresource.php');
 
 	/**
 	 * A manager to standardize the finding and listing of installed gateways.
 	 */
-	Class PaymentGatewayManager extends Manager {
-
-		public function __construct() {}
+	Class PaymentGatewayManager implements FileResource {
 
 		/**
 		 * Sets the default gateway.
 		 * Will throw an exception if the gateway can not be found.
 		 *
 		 * @param string $name
-		 * @return void
+		 * @return boolean
 		 */
-		public function setDefaultGateway($name){
-			if($this->__getClassPath($name)){
+		public static function setDefaultGateway($name){
+			if(self::__getClassPath($name)){
 				Symphony::Configuration()->set('default_gateway', $name, 'pgi_loader');
-				Administration::instance()->saveConfig();
+				return Symphony::Configuration()->write();
 			}
 			else throw new PaymentGatewayException(
 				__('This gateway can not be found. Can not save as default.')
@@ -33,7 +31,7 @@
 		 *
 		 * @return string
 		 */
-		public function getDefaultGateway(){
+		public static function getDefaultGateway(){
 			$gateway = Symphony::Configuration()->get('default_gateway', 'pgi_loader');
 			if($gateway) {
 				return $gateway;
@@ -50,7 +48,7 @@
 		 * @param string $name
 		 * @return string
 		 */
-		public function __getClassName($name){
+		public static function __getClassName($name){
 			return $name . 'PaymentGateway';
 		}
 
@@ -64,7 +62,7 @@
 		 *  gateway is returned.
 		 *	If the gateway is not found, false is returned.
 		 */
-		public function __getClassPath($name){
+		public static function __getClassPath($name){
 			$extensions = Symphony::ExtensionManager()->listInstalledHandles();
 
 			if(is_array($extensions) && !empty($extensions)){
@@ -86,8 +84,8 @@
 		 * @return string|boolean
 		 * @todo fix return if gateway does not exist.
 		 */
-		public function __getDriverPath($name){
-			return $this->__getClassPath($name) . "/pgi.$name.php";
+		public static function __getDriverPath($name){
+			return self::__getClassPath($name) . "/pgi.$name.php";
 		}
 
 		/**
@@ -97,7 +95,7 @@
 		 * @param string $filename
 		 * @return string|boolean
 		 */
-		public function __getHandleFromFilename($filename){
+		public static function __getHandleFromFilename($filename){
 			return preg_replace(array('/^pgi./i', '/.php$/i'), '', $filename);
 		}
 
@@ -108,9 +106,8 @@
 		 *
 		 * @return array
 		 */
-		public function listAll(){
+		public static function listAll(){
 			$result = array();
-
 			$extensions = Symphony::ExtensionManager()->listInstalledHandles();
 
 			if(is_array($extensions) && !empty($extensions)){
@@ -122,7 +119,7 @@
 					if(is_array($tmp['filelist']) && !empty($tmp['filelist'])){
 						foreach($tmp['filelist'] as $f){
 							$f = preg_replace(array('/^pgi./i', '/.php$/i'), '', $f);
-							$result[$f] = $this->about($f);
+							$result[$f] = self::about($f);
 						}
 					}
 				}
@@ -130,6 +127,22 @@
 
 			ksort($result);
 			return $result;
+		}
+
+		public static function about($name) {
+			$classname = self::__getClassName($name);
+			$path = self::__getDriverPath($name);
+
+			if(!@file_exists($path)) return false;
+
+			require_once($path);
+
+			$handle = self::__getHandleFromFilename(basename($path));
+
+			if(is_callable(array($classname, 'about'))){
+				$about = call_user_func(array($classname, 'about'));
+				return array_merge($about, array('handle' => $handle));
+			}
 		}
 
 		/**
@@ -141,9 +154,9 @@
 		 *	If the gateway is found, an instantiated object is returned.
 		 *	If the gateway is not found, an error is triggered.
 		 */
-		public function &create($name) {
-			$classname = $this->__getClassName($name);
-			$path = $this->__getDriverPath($name);
+		public static function &create($name) {
+			$classname = self::__getClassName($name);
+			$path = self::__getDriverPath($name);
 
 			if(!is_file($path)){
 				throw new PaymentGatewayException(

@@ -1,8 +1,6 @@
-$(document).ready(function() {
-
+jQuery(document).ready(function() {
 	// Pickers
-	$('.pgi-picker').symphonyPickable({
+	jQuery('.pgi-picker').symphonyPickable({
 		pickables: '.pgi-pickable'
 	});
-
 });

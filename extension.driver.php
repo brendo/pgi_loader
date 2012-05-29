@@ -2,21 +2,6 @@
 
 	class Extension_PGI_Loader extends Extension {
 
-		public function about() {
-			return array(
-				'name' => 'Payment Gateway Loader',
-				'version' => '0.1',
-				'release-date' => '2011-12-14',
-				'author' => array(
-					array(
-						'name' => 'Brendan Abbott',
-						'email' => 'brendan@bloodbone.ws'
-					),
-				),
-				'description' => 'Provides an common interface for Payment Gateway extensions to extend so developers can interact with a number of gateways using the same API'
-			);
-		}
-
 	/*-------------------------------------------------------------------------
 		Definition:
 	-------------------------------------------------------------------------*/
@@ -70,8 +55,7 @@
 			// Get available Payment Gateways
 			require_once EXTENSIONS . '/pgi_loader/lib/class.paymentgatewaymanager.php';
 
-			$payment_gateway_manager = new PaymentGatewayManager($this);
-			$payment_gateways = $payment_gateway_manager->listAll();
+			$payment_gateways = PaymentGatewayManager::listAll();
 			if(count($payment_gateways) >= 1){
 				$fieldset = new XMLElement('fieldset', NULL, array('class' => 'settings pgi-picker'));
 				$fieldset->appendChild(new XMLElement('legend', __('Payment Gateway')));
@@ -82,7 +66,7 @@
 
 				// Get the default gateway
 				try {
-					$default_gateway = $payment_gateway_manager->getDefaultGateway();
+					$default_gateway = PaymentGatewayManager::getDefaultGateway();
 				}
 				catch (PaymentGatewayException $ex) {
 					$default_gateway = false;
@@ -105,7 +89,7 @@
 			}
 
 			foreach($payment_gateways as $gateway) {
-				$gateway_settings = $payment_gateway_manager->create($gateway['handle'])->getPreferencesPane();
+				$gateway_settings = PaymentGatewayManager::create($gateway['handle'])->getPreferencesPane();
 
 				if(is_a($gateway_settings, 'XMLElement')) {
 					$context['wrapper']->appendChild($gateway_settings);
@@ -121,7 +105,7 @@
 		public function savePreferences(array &$context){
 			$settings = $context['settings'];
 
-			Administration::instance()->saveConfig();
+			return Symphony::Configuration()->write();
 		}
 
 	}

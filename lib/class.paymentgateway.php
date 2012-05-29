@@ -25,12 +25,11 @@
 		 * @return PaymentGateway
 		 */
 		public static function create($gateway = null){
-			$payment_gateway_manager = new PaymentGatewayManager;
 			if(!is_null($gateway)){
-				return $payment_gateway_manager->create($gateway);
+				return PaymentGatewayManager::create($gateway);
 			}
 			else{
-				return $payment_gateway_manager->create($payment_gateway_manager->getDefaultGateway());
+				return PaymentGatewayManager::create(PaymentGatewayManager::getDefaultGateway());
 			}
 		}
 
