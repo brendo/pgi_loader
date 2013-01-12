@@ -57,6 +57,7 @@
 
 			$payment_gateways = PaymentGatewayManager::listAll();
 			if(count($payment_gateways) >= 1){
+                $container = new XMLElement('div', NULL, array('id' => 'gateways'));
 				$fieldset = new XMLElement('fieldset', NULL, array('class' => 'settings pgi-picker'));
 				$fieldset->appendChild(new XMLElement('legend', __('Payment Gateway')));
 				$label = Widget::Label(__('Gateway'));
@@ -84,8 +85,11 @@
 				$label->appendChild($select);
 				$fieldset->appendChild($label);
 
-				// Append payment gateway selection
-				$context['wrapper']->appendChild($fieldset);
+                // Append to wrap
+                $container->appendChild($fieldset);
+
+                // Append payment gateway selection
+				$context['wrapper']->appendChild($container);
 			}
 
 			foreach($payment_gateways as $gateway) {
